@@ -6,7 +6,7 @@
 #include "utils/glm_utils.h"
 
 
-namespace object2D
+namespace obj2D
 {
 
     Mesh* CreateTriangle(const std::string& name, glm::vec3 corner1, glm::vec3 corner2, glm::vec3 corner3, glm::vec3 color, bool fill = false);

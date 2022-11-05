@@ -3,8 +3,8 @@
 #include <vector>
 #include <iostream>
 
-#include "lab_m1/Tema1/transform2D.h"
-#include "lab_m1/Tema1/object2D.h"
+#include "lab_m1/Tema1/transf2D.h"
+#include "lab_m1/Tema1/obj2D.h"
 
 using namespace std;
 using namespace m1;
@@ -59,43 +59,43 @@ void Tema1::Init()
     // Initialize angularStep
     angularStep = 0;
 
-    /* Mesh* square1 = object2D::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
+    /* Mesh* square1 = obj2D::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
     AddMeshToList(square1);
 
-    Mesh* square2 = object2D::CreateSquare("square2", corner, squareSide, glm::vec3(0, 1, 0));
+    Mesh* square2 = obj2D::CreateSquare("square2", corner, squareSide, glm::vec3(0, 1, 0));
     AddMeshToList(square2);
 
-    Mesh* square3 = object2D::CreateSquare("square3", corner, squareSide, glm::vec3(0, 0, 1));
+    Mesh* square3 = obj2D::CreateSquare("square3", corner, squareSide, glm::vec3(0, 0, 1));
     AddMeshToList(square3); */
 
-    /* Mesh* circle1 = object2D::CreateCircle("circle1", corner + glm::vec3(525, 300, 0), 100, 64, glm::vec3(0.19f, 0.34f, 0.22f), true);
+    /* Mesh* circle1 = obj2D::CreateCircle("circle1", corner + glm::vec3(525, 300, 0), 100, 64, glm::vec3(0.19f, 0.34f, 0.22f), true);
     AddMeshToList(circle1);
 
-    Mesh* triangle1 = object2D::CreateTriangle("triangle1", corner + glm::vec3(0, 175, 0), corner + glm::vec3(0, 400, 0), corner + glm::vec3(525, 288, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* triangle1 = obj2D::CreateTriangle("triangle1", corner + glm::vec3(0, 175, 0), corner + glm::vec3(0, 400, 0), corner + glm::vec3(525, 288, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(triangle1);
 
-    Mesh* triangle2 = object2D::CreateTriangle("triangle2", corner + glm::vec3(175, 325, 0), corner + glm::vec3(325, 325, 0), corner + glm::vec3(250, 575, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* triangle2 = obj2D::CreateTriangle("triangle2", corner + glm::vec3(175, 325, 0), corner + glm::vec3(325, 325, 0), corner + glm::vec3(250, 575, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(triangle2);
 
-    Mesh* triangle3 = object2D::CreateTriangle("triangle3", corner + glm::vec3(175, 250, 0), corner + glm::vec3(325, 250, 0), corner + glm::vec3(250, 0, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* triangle3 = obj2D::CreateTriangle("triangle3", corner + glm::vec3(175, 250, 0), corner + glm::vec3(325, 250, 0), corner + glm::vec3(250, 0, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(triangle3);
 
-    Mesh* triangle4 = object2D::CreateTriangle("triangle4", corner + glm::vec3(590, 230, 0), corner + glm::vec3(590, 275, 0), corner + glm::vec3(700, 245, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
+    Mesh* triangle4 = obj2D::CreateTriangle("triangle4", corner + glm::vec3(590, 230, 0), corner + glm::vec3(590, 275, 0), corner + glm::vec3(700, 245, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
     AddMeshToList(triangle4); */
 
-    Mesh* head = object2D::CreateCircle("head", corner + glm::vec3(210, 120, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
+    Mesh* head = obj2D::CreateCircle("head", corner + glm::vec3(210, 120, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
     AddMeshToList(head);
 
-    Mesh* body = object2D::CreateTriangle("body", corner + glm::vec3(0, 70, 0), corner + glm::vec3(0, 160, 0), corner + glm::vec3(210, 115.2f, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* body = obj2D::CreateTriangle("body", corner + glm::vec3(0, 70, 0), corner + glm::vec3(0, 160, 0), corner + glm::vec3(210, 115.2f, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(body);
 
-    Mesh* leftArm = object2D::CreateTriangle("leftArm", corner + glm::vec3(70, 130, 0), corner + glm::vec3(130, 130, 0), corner + glm::vec3(100, 230, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* leftArm = obj2D::CreateTriangle("leftArm", corner + glm::vec3(70, 130, 0), corner + glm::vec3(130, 130, 0), corner + glm::vec3(100, 230, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(leftArm);
 
-    Mesh* rightArm = object2D::CreateTriangle("rightArm", corner + glm::vec3(70, 100, 0), corner + glm::vec3(130, 100, 0), corner + glm::vec3(100, 0, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
+    Mesh* rightArm = obj2D::CreateTriangle("rightArm", corner + glm::vec3(70, 100, 0), corner + glm::vec3(130, 100, 0), corner + glm::vec3(100, 0, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
     AddMeshToList(rightArm);
 
-    Mesh* beak = object2D::CreateTriangle("beak", corner + glm::vec3(236, 98, 0), corner + glm::vec3(236, 116, 0), corner + glm::vec3(280, 104, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
+    Mesh* beak = obj2D::CreateTriangle("beak", corner + glm::vec3(236, 98, 0), corner + glm::vec3(236, 116, 0), corner + glm::vec3(280, 104, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
     AddMeshToList(beak);
 
 }
@@ -121,7 +121,7 @@ void Tema1::Update(float deltaTimeSeconds)
     // add them over there!
 
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(150, 250);
+    modelMatrix *= transf2D::Translate(150, 250);
     // TODO(student): Create animations by multiplying the current
     // transform matrix with the matrices you just implemented.
     // Remember, the last matrix in the chain will take effect first!
@@ -135,37 +135,37 @@ void Tema1::Update(float deltaTimeSeconds)
     }
     translateX += deltaTimeSeconds * 100 * dirX;
     translateY += deltaTimeSeconds * 100 * dirY;
-    modelMatrix *= transform2D::Translate(translateX, translateY);
+    modelMatrix *= transf2D::Translate(translateX, translateY);
 
 
     RenderMesh2D(meshes["square1"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(400, 250);
+    modelMatrix *= transf2D::Translate(400, 250);
     // TODO(student): Create animations by multiplying the current
     // transform matrix with the matrices you just implemented
     // Remember, the last matrix in the chain will take effect first!
     angularStep += deltaTimeSeconds * 2.5;
 
-    modelMatrix *= transform2D::Translate(cx, cy);
-    modelMatrix *= transform2D::Rotate(angularStep);
-    modelMatrix *= transform2D::Translate(-cx, -cy);
+    modelMatrix *= transf2D::Translate(cx, cy);
+    modelMatrix *= transf2D::Rotate(angularStep);
+    modelMatrix *= transf2D::Translate(-cx, -cy);
 
     RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(650, 250);
+    modelMatrix *= transf2D::Translate(650, 250);
     // TODO(student): Create animations by multiplying the current
     // transform matrix with the matrices you just implemented
     // Remember, the last matrix in the chain will take effect first!
     scaleX += deltaTimeSeconds * 0.5;
     scaleY += deltaTimeSeconds * 0.5;
-    modelMatrix *= transform2D::Scale(scaleX, scaleY);
+    modelMatrix *= transf2D::Scale(scaleX, scaleY);
 
     RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix); */
 
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(150, 250);
+    modelMatrix *= transf2D::Translate(150, 250);
     if (translateX > 200) {
         dirX = -1;
         dirY = -1;
@@ -176,18 +176,18 @@ void Tema1::Update(float deltaTimeSeconds)
     }
     translateX += deltaTimeSeconds * 100 * dirX;
     translateY += deltaTimeSeconds * 100 * dirY;
-    modelMatrix *= transform2D::Translate(translateX, translateY);
+    modelMatrix *= transf2D::Translate(translateX, translateY);
     if (dirX == 1)
     {
-        modelMatrix *= transform2D::Translate(cx, cy);
-        modelMatrix *= transform2D::Rotate(45 * M_PI / 180);
-        modelMatrix *= transform2D::Translate(-cx, -cy);
+        modelMatrix *= transf2D::Translate(cx, cy);
+        modelMatrix *= transf2D::Rotate(45 * M_PI / 180);
+        modelMatrix *= transf2D::Translate(-cx, -cy);
     }
     if (dirX == -1)
     {
-        modelMatrix *= transform2D::Translate(cx, cy);
-        modelMatrix *= transform2D::Rotate(225 * M_PI / 180);
-        modelMatrix *= transform2D::Translate(-cx, -cy);
+        modelMatrix *= transf2D::Translate(cx, cy);
+        modelMatrix *= transf2D::Rotate(225 * M_PI / 180);
+        modelMatrix *= transf2D::Translate(-cx, -cy);
     }
     RenderMesh2D(meshes["head"], shaders["VertexColor"], modelMatrix);
 

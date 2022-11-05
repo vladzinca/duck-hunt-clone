@@ -1,11 +1,11 @@
-#include "object2D.h"
+#include "obj2D.h"
 
 #include <vector>
 
 #include "core/engine.h"
 #include "utils/gl_utils.h"
 
-Mesh* object2D::CreateTriangle(
+Mesh* obj2D::CreateTriangle(
     const std::string& name,
     glm::vec3 corner1,
     glm::vec3 corner2,
@@ -35,7 +35,7 @@ Mesh* object2D::CreateTriangle(
     return triangle;
 }
 
-Mesh* object2D::CreateCircle(
+Mesh* obj2D::CreateCircle(
     const std::string& name,
     glm::vec3 center,
     float radius,
@@ -72,7 +72,7 @@ Mesh* object2D::CreateCircle(
     return circle;
 }
 
-Mesh* object2D::CreateSquare(
+Mesh* obj2D::CreateSquare(
     const std::string &name,
     glm::vec3 leftBottomCorner,
     float length,
