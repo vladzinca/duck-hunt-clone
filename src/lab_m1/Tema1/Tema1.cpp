@@ -37,14 +37,15 @@ void Tema1::Init()
     GetCameraInput()->SetActive(false);
 
     glm::vec3 corner = glm::vec3(0, 0, 0);
-    float squareSide = 100;
+    float rectangleWidth = 280;
+    float rectangleHeight = 230;
 
     // TODO(student): Compute coordinates of a square's center, and store
     // then in the `cx` and `cy` class variables (see the header). Use
     // `corner` and `squareSide`. These two class variables will be used
     // in the `Update()` function. Think about it, why do you need them?
-    cx = corner.x + squareSide / 2.0f;
-    cy = corner.y + squareSide / 2.0f;
+    cx = corner.x + rectangleWidth / 2.0f;
+    cy = corner.y + rectangleHeight / 2.0f;
     dirX = 1;
     dirY = 1;
 
@@ -97,6 +98,9 @@ void Tema1::Init()
 
     Mesh* beak = obj2D::CreateTriangle("beak", corner + glm::vec3(236, 98, 0), corner + glm::vec3(236, 116, 0), corner + glm::vec3(280, 104, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
     AddMeshToList(beak);
+
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(1.0f, 0, 1.0f), true);
+    AddMeshToList(hitbox);
 
 }
 
@@ -198,6 +202,8 @@ void Tema1::Update(float deltaTimeSeconds)
     RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
 
     RenderMesh2D(meshes["beak"], shaders["VertexColor"], modelMatrix);
+
+    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 }
 
 
