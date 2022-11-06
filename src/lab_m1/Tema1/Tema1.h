@@ -36,6 +36,13 @@ namespace m1
 
         // TODO(student): If you need any other class variables, define them here.
         float dirX, dirY;
+        float rectangleWidth, rectangleHeight;
+        int random;
+
+        float centerX, centerY;
+        float radianRandom;
+
+        int flag, flag2;
 
     };
 }   // namespace m1
