@@ -41,8 +41,11 @@ namespace m1
 
         float centerX, centerY;
         float radianRandom;
+        float initialRandom;
 
-        int flag, flag2;
+        int flag, flag2, flagInit;
+
+        float pozX, pozY;
 
     };
 }   // namespace m1

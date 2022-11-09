@@ -55,6 +55,9 @@ void Tema1::Init()
 
     radianRandom = (float)random * (float)M_PI / 180.0f;
 
+    random = 30.0f;
+    initialRandom = random;
+
     dirX = cosf((float)random * (float)M_PI / 180.0f); // 0.5
     dirY = sinf((float)random * (float)M_PI / 180.0f); // 0.86
 
@@ -112,6 +115,9 @@ void Tema1::Init()
     centerY = cy;
     flag = 0;
     flag2 = 0;
+    pozX = 0;
+    pozY = 0;
+    flagInit = 0;
 
     Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(1.0f, 0, 1.0f), true);
     AddMeshToList(hitbox);
@@ -210,43 +216,125 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glm::ivec2 resolution = window->GetResolution();
 
+    //if (centerX > resolution.x || centerY > resolution.y || centerX < 0 || centerY < 0) {
+    //    flag = 1;
+    //    flagInit = 1;
+    //    centerX -= 1;
+    //    centerY -= 1;
+    //}
+    //else {
+    //    flag = 0;
+    //}
 
-    if (centerX > resolution.x)
-        flag = 1;
+    //if (flagInit == 0)
+    //{
+    //    modelMatrix = glm::mat3(1);
+    //    modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
 
-    if (flag == 0)
+    //    modelMatrix *= transf2D::Translate(cx, cy);
+    //    modelMatrix *= transf2D::Rotate((float)30.0f * (float)M_PI / 180.0f);
+    //    modelMatrix *= transf2D::Translate(-cx, -cy);
+
+    //    translateX += deltaTimeSeconds * 100 * 1;
+    //    centerX += deltaTimeSeconds * 100 * cosf((float)30.0f * (float)M_PI / 180.0f);
+    //    centerY += deltaTimeSeconds * 100 * sinf((float)30.0f * (float)M_PI / 180.0f);
+    //    modelMatrix *= transf2D::Translate(translateX, translateY);
+
+    //    cout << translateX << "\n";
+
+    //    pozX = centerX - rectangleWidth / 2.0f;
+    //    pozY = centerY - rectangleHeight / 2.0f;
+    //}
+    //else if (flag == 1) {
+    //    modelMatrix = glm::mat3(1);
+    //    modelMatrix *= transf2D::Translate(pozX, pozY);
+    //    modelMatrix *= transf2D::Translate(cx, cy);
+    //    modelMatrix *= transf2D::Rotate((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
+    //    modelMatrix *= transf2D::Translate(-cx, -cy);
+    //    flag2 = 0;
+    //}
+    //else if (flag == 0) {
+    //    if (flag2 == 0) {
+    //        translateX = 0;
+    //        translateY = 0;
+    //        flag2 = 1;
+    //    }
+    //    translateX += deltaTimeSeconds * 100;
+    //    centerX += deltaTimeSeconds * 100 * cosf((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
+    //    centerY += deltaTimeSeconds * 100 * sinf((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
+    //    modelMatrix *= transf2D::Translate(translateX, translateY);
+    //    cout << translateX << "\n";
+    //}
+
+    if (flagInit == 0)
     {
         modelMatrix = glm::mat3(1);
         modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
 
         modelMatrix *= transf2D::Translate(cx, cy);
-        modelMatrix *= transf2D::Rotate((float)30.0f * (float)M_PI / 180.0f);
+        modelMatrix *= transf2D::Rotate((float)random * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(-cx, -cy);
 
         translateX += deltaTimeSeconds * 100 * 1;
-        centerX += deltaTimeSeconds * 100 * cosf((float)30.0f * (float)M_PI / 180.0f);
-        centerY += deltaTimeSeconds * 100 * sinf((float)30.0f * (float)M_PI / 180.0f);
+        centerX += deltaTimeSeconds * 100 * cosf((float)random * (float)M_PI / 180.0f);
+        centerY += deltaTimeSeconds * 100 * sinf((float)random * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(translateX, translateY);
+
+        pozX = centerX - rectangleWidth / 2.0f;
+        pozY = centerY - rectangleHeight / 2.0f;
+
+        if (centerX > resolution.x)
+            flagInit = 1;
     }
-
-    if (flag == 1) {
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate(centerX - rectangleWidth / 2.0f, centerY - rectangleHeight / 2.0f);
-        modelMatrix *= transf2D::Translate(cx, cy);
-        modelMatrix *= transf2D::Rotate((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(-cx, -cy);
-
-        if (flag2 == 0) {
-            translateX = 0;
-            translateY = 0;
-            flag2 = 1;
+    else if (flagInit == 1) {
+        if (centerX > resolution.x) {
+            flag = 1;
+            random = 90.0f + (90.0f - random); // fa si pentru ciocnirea invers si scapa de codul nefolositor
+            centerX -= 1;
+            centerY -= 1;
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
         }
-        translateX += deltaTimeSeconds * 100 * 1;
-        //centerX += deltaTimeSeconds * 100 * cosf((float)30.0f * (float)M_PI / 180.0f);
-        //centerY += deltaTimeSeconds * 100 * sinf((float)30.0f * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(translateX, translateY);
+        else if (centerY > resolution.y) {
+            flag = 1;
+            random = 180.0f + (180.0f - random);
+            centerX -= 1;
+            centerY -= 1;
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
+        }
+        else if (centerX < 0) {
+            flag = 1;
+            random = 270.0f + (270.0f - random);
+            centerX += 1;
+            centerY += 1;
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
+        }
+        else if (centerY < 0) {
+            flag = 1;
+            random = 360.0f + (360.0f - random);
+            centerX += 1;
+            centerY += 1;
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
+        }
+        else
+            flag = 0;
+
+        if (flag == 0)
+        {
+            centerX += deltaTimeSeconds * 100 * cosf((float)(random) * (float)M_PI / 180.0f);
+            centerY += deltaTimeSeconds * 100 * sinf((float)(random) * (float)M_PI / 180.0f);
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transf2D::Translate(pozX, pozY);
+            modelMatrix *= transf2D::Translate(cx, cy);
+            modelMatrix *= transf2D::Rotate((float)(random) * (float)M_PI / 180.0f);
+            modelMatrix *= transf2D::Translate(-cx, -cy);
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
+        }
     }
-    //cout << beakCoordinates.x << " " << beakCoordinates.y << "\n";
 
     RenderMesh2D(meshes["head"], shaders["VertexColor"], modelMatrix);
 
