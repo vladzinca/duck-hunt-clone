@@ -51,15 +51,10 @@ void Tema1::Init()
         random = rand() % 50 + 15;
     else
         random = rand() % 50 + 105;
-    cout << random;
 
-    radianRandom = (float)random * (float)M_PI / 180.0f;
+    //random = 0;
 
-    random = 30.0f;
-    initialRandom = random;
-
-    dirX = cosf((float)random * (float)M_PI / 180.0f); // 0.5
-    dirY = sinf((float)random * (float)M_PI / 180.0f); // 0.86
+    speed = 175;
 
     // Initialize tx and ty (the translation steps)
     translateX = 0;
@@ -71,6 +66,8 @@ void Tema1::Init()
 
     // Initialize angularStep
     angularStep = 0;
+    angularStep2 = 0;
+    //angularStep2 = ((float)(45.0f) * (float)M_PI / 180.0f);
 
     /* Mesh* square1 = obj2D::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
     AddMeshToList(square1);
@@ -119,8 +116,11 @@ void Tema1::Init()
     pozY = 0;
     flagInit = 0;
 
-    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(1.0f, 0, 1.0f), true);
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(0, 0.5f, 1.0f), true);
     AddMeshToList(hitbox);
+
+    Mesh* grass = obj2D::CreateRectangle("grass", corner, resolution.x, 230.0f * 2.0f / 3.0f, glm::vec3(0, 0.6f, 0.09f), true);
+    AddMeshToList(grass);
 
 }
 
@@ -128,7 +128,7 @@ void Tema1::Init()
 void Tema1::FrameStart()
 {
     // Clears the color buffer (using the previously set color) and depth buffer
-    glClearColor(0, 0, 0, 1);
+    glClearColor(0, 0.5f, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::ivec2 resolution = window->GetResolution();
@@ -216,6 +216,10 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glm::ivec2 resolution = window->GetResolution();
 
+    grassModelMatrix = glm::mat3(1);
+
+    RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
+
     //if (centerX > resolution.x || centerY > resolution.y || centerX < 0 || centerY < 0) {
     //    flag = 1;
     //    flagInit = 1;
@@ -275,62 +279,62 @@ void Tema1::Update(float deltaTimeSeconds)
         modelMatrix *= transf2D::Rotate((float)random * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(-cx, -cy);
 
-        translateX += deltaTimeSeconds * 100 * 1;
-        centerX += deltaTimeSeconds * 100 * cosf((float)random * (float)M_PI / 180.0f);
-        centerY += deltaTimeSeconds * 100 * sinf((float)random * (float)M_PI / 180.0f);
+        translateX += deltaTimeSeconds * speed * 1;
+        centerX += deltaTimeSeconds * speed * cosf((float)random * (float)M_PI / 180.0f);
+        centerY += deltaTimeSeconds * speed * sinf((float)random * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(translateX, translateY);
 
         pozX = centerX - rectangleWidth / 2.0f;
         pozY = centerY - rectangleHeight / 2.0f;
 
-        if (centerX > resolution.x)
+        if (centerX > resolution.x || centerY > resolution.y || centerX < 0)
             flagInit = 1;
     }
     else if (flagInit == 1) {
         if (centerX > resolution.x) {
-            flag = 1;
-            random = 90.0f + (90.0f - random); // fa si pentru ciocnirea invers si scapa de codul nefolositor
+            if (random > 0 && random < 90.0f)
+                random = 90.0f + (90.0f - random);
+            else
+                random = 180.0f + (360.0f - random);
             centerX -= 1;
-            centerY -= 1;
             pozX = centerX - rectangleWidth / 2.0f;
-            pozY = centerY - rectangleHeight / 2.0f;
         }
         else if (centerY > resolution.y) {
-            flag = 1;
-            random = 180.0f + (180.0f - random);
-            centerX -= 1;
+            if (random > 90.0f && random < 180.0f)
+                random = 180.0f + (180.0f - random);
+            else
+                random = 270.0f + (90.0f - random);
             centerY -= 1;
-            pozX = centerX - rectangleWidth / 2.0f;
             pozY = centerY - rectangleHeight / 2.0f;
         }
         else if (centerX < 0) {
-            flag = 1;
-            random = 270.0f + (270.0f - random);
+            if (random > 180.0f && random < 270.0f)
+                random = 270.0f + (270.0f - random);
+            else
+                random = 180.f - random;
             centerX += 1;
-            centerY += 1;
             pozX = centerX - rectangleWidth / 2.0f;
-            pozY = centerY - rectangleHeight / 2.0f;
         }
         else if (centerY < 0) {
-            flag = 1;
-            random = 360.0f + (360.0f - random);
-            centerX += 1;
+            if (random > 270.0f && random < 360.0f)
+                random = 360.0f - random;
+            else
+                random = 90.0f + (270.0f - random);
             centerY += 1;
-            pozX = centerX - rectangleWidth / 2.0f;
             pozY = centerY - rectangleHeight / 2.0f;
         }
         else
-            flag = 0;
-
-        if (flag == 0)
         {
-            centerX += deltaTimeSeconds * 100 * cosf((float)(random) * (float)M_PI / 180.0f);
-            centerY += deltaTimeSeconds * 100 * sinf((float)(random) * (float)M_PI / 180.0f);
             modelMatrix = glm::mat3(1);
             modelMatrix *= transf2D::Translate(pozX, pozY);
+
             modelMatrix *= transf2D::Translate(cx, cy);
             modelMatrix *= transf2D::Rotate((float)(random) * (float)M_PI / 180.0f);
             modelMatrix *= transf2D::Translate(-cx, -cy);
+
+            centerX += deltaTimeSeconds * speed * cosf((float)(random) * (float)M_PI / 180.0f);
+            centerY += deltaTimeSeconds * speed * sinf((float)(random) * (float)M_PI / 180.0f);
+
             pozX = centerX - rectangleWidth / 2.0f;
             pozY = centerY - rectangleHeight / 2.0f;
         }
@@ -340,13 +344,36 @@ void Tema1::Update(float deltaTimeSeconds)
 
     RenderMesh2D(meshes["body"], shaders["VertexColor"], modelMatrix);
 
-    RenderMesh2D(meshes["leftArm"], shaders["VertexColor"], modelMatrix);
-
-    RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
-
     RenderMesh2D(meshes["beak"], shaders["VertexColor"], modelMatrix);
 
-    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
+    //RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
+
+    tmpModelMatrix = modelMatrix;
+
+    if (angularStep < ((float)(30.0f) * (float)M_PI / 180.0f))
+        angularStep += deltaTimeSeconds;
+    else
+        angularStep = (float)(- 15.0f) * (float)M_PI / 180.0f;
+    //cout << angularStep << "\n";
+
+    modelMatrix *= transf2D::Translate(cx, cy);
+    modelMatrix *= transf2D::Rotate(angularStep);
+    modelMatrix *= transf2D::Translate(-cx, -cy);
+
+    RenderMesh2D(meshes["leftArm"], shaders["VertexColor"], modelMatrix);
+
+    modelMatrix = tmpModelMatrix;
+
+    if (angularStep2 > ((float)(- 30.0f) * (float)M_PI / 180.0f))
+        angularStep2 -= deltaTimeSeconds;
+    else
+        angularStep2 = ((float)(15.0f) * (float)M_PI / 180.0f);
+
+    modelMatrix *= transf2D::Translate(cx, cy);
+    modelMatrix *= transf2D::Rotate(angularStep2);
+    modelMatrix *= transf2D::Translate(-cx, -cy);
+
+    RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
 }
 
 

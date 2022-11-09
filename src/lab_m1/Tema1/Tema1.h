@@ -42,10 +42,15 @@ namespace m1
         float centerX, centerY;
         float radianRandom;
         float initialRandom;
+        float angularStep2;
 
         int flag, flag2, flagInit;
+        glm::mat3 tmpModelMatrix;
+        glm::mat3 grassModelMatrix;
 
         float pozX, pozY;
+
+        int speed;
 
     };
 }   // namespace m1
