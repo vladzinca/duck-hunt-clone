@@ -51,6 +51,8 @@ namespace m1
         float pozX, pozY;
 
         int speed;
+        float timeSinceSpawn;
+        int reachedHeaven;
 
     };
 }   // namespace m1

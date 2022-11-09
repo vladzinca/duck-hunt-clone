@@ -116,6 +116,10 @@ void Tema1::Init()
     pozY = 0;
     flagInit = 0;
 
+    reachedHeaven = 0;
+
+    timeSinceSpawn = 0;
+
     Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(0, 0.5f, 1.0f), true);
     AddMeshToList(hitbox);
 
@@ -216,9 +220,11 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glm::ivec2 resolution = window->GetResolution();
 
+    timeSinceSpawn += deltaTimeSeconds;
+
     grassModelMatrix = glm::mat3(1);
 
-    RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
+    //RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
 
     //if (centerX > resolution.x || centerY > resolution.y || centerX < 0 || centerY < 0) {
     //    flag = 1;
@@ -269,8 +275,38 @@ void Tema1::Update(float deltaTimeSeconds)
     //    modelMatrix *= transf2D::Translate(translateX, translateY);
     //    cout << translateX << "\n";
     //}
+    if (timeSinceSpawn >= 7 && reachedHeaven == 0)
+    {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transf2D::Translate(pozX, pozY);
 
-    if (flagInit == 0)
+        modelMatrix *= transf2D::Translate(cx, cy);
+        modelMatrix *= transf2D::Rotate((float)90.0f * (float)M_PI / 180.0f);
+        modelMatrix *= transf2D::Translate(-cx, -cy);
+
+        centerX += deltaTimeSeconds * speed * cosf((float)90.0f * (float)M_PI / 180.0f);
+        centerY += deltaTimeSeconds * speed * sinf((float)90.0f * (float)M_PI / 180.0f);
+
+        pozX = centerX - rectangleWidth / 2.0f;
+        pozY = centerY - rectangleHeight / 2.0f;
+        if (pozY > resolution.y * 9.0f / 8.0f)
+            reachedHeaven = 1;
+    }
+    else if (timeSinceSpawn >= 7 && reachedHeaven == 1)
+    {
+        timeSinceSpawn = 0;
+        flagInit = 0;
+        if ((rand() % 2) == 0)
+            random = rand() % 50 + 15;
+        else
+            random = rand() % 50 + 105;
+        translateX = 0;
+        centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
+        centerY = cy;
+        cout << "bon" << "\n";
+        reachedHeaven = 0;
+    }
+    else if (flagInit == 0)
     {
         modelMatrix = glm::mat3(1);
         modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
@@ -353,7 +389,7 @@ void Tema1::Update(float deltaTimeSeconds)
     if (angularStep < ((float)(30.0f) * (float)M_PI / 180.0f))
         angularStep += deltaTimeSeconds;
     else
-        angularStep = (float)(- 15.0f) * (float)M_PI / 180.0f;
+        angularStep = (float)(- 10.0f) * (float)M_PI / 180.0f;
     //cout << angularStep << "\n";
 
     modelMatrix *= transf2D::Translate(cx, cy);
@@ -367,7 +403,7 @@ void Tema1::Update(float deltaTimeSeconds)
     if (angularStep2 > ((float)(- 30.0f) * (float)M_PI / 180.0f))
         angularStep2 -= deltaTimeSeconds;
     else
-        angularStep2 = ((float)(15.0f) * (float)M_PI / 180.0f);
+        angularStep2 = ((float)(10.0f) * (float)M_PI / 180.0f);
 
     modelMatrix *= transf2D::Translate(cx, cy);
     modelMatrix *= transf2D::Rotate(angularStep2);
