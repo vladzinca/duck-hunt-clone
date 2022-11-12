@@ -44,15 +44,19 @@ namespace m1
         float initialRandom;
         float angularStep2;
 
-        int flag, flag2, flagInit;
+        int flag, flag2, flagInit, flagTime, firstBird, theBirdIsHit;
         glm::mat3 tmpModelMatrix;
         glm::mat3 grassModelMatrix;
+        glm::mat3 auxModelMatrix;
 
         float pozX, pozY;
 
         int speed;
         float timeSinceSpawn;
         int reachedHeaven;
+
+        int trueMouseX, trueMouseY;
+        int auxMouseX, auxMouseY;
 
     };
 }   // namespace m1

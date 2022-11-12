@@ -54,7 +54,9 @@ void Tema1::Init()
 
     //random = 0;
 
-    speed = 175;
+    theBirdIsHit = 0;
+
+    speed = 25; // 175 // 250
 
     // Initialize tx and ty (the translation steps)
     translateX = 0;
@@ -115,15 +117,16 @@ void Tema1::Init()
     pozX = 0;
     pozY = 0;
     flagInit = 0;
+    firstBird = 1;
 
     reachedHeaven = 0;
 
     timeSinceSpawn = 0;
 
-    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(0, 0.5f, 1.0f), true);
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(1.0f/* 0.0f */, 0.5f, 1.0f), false);
     AddMeshToList(hitbox);
 
-    Mesh* grass = obj2D::CreateRectangle("grass", corner, resolution.x, 230.0f * 2.0f / 3.0f, glm::vec3(0, 0.6f, 0.09f), true);
+    Mesh* grass = obj2D::CreateRectangle("grass", corner, resolution.x, 230.0f * 3.0f / 4.0f, glm::vec3(0, 0.6f, 0.09f), true);
     AddMeshToList(grass);
 
 }
@@ -275,7 +278,7 @@ void Tema1::Update(float deltaTimeSeconds)
     //    modelMatrix *= transf2D::Translate(translateX, translateY);
     //    cout << translateX << "\n";
     //}
-    if (timeSinceSpawn >= 7 && reachedHeaven == 0)
+    if (timeSinceSpawn >= 100 && reachedHeaven == 0) // 5
     {
         modelMatrix = glm::mat3(1);
         modelMatrix *= transf2D::Translate(pozX, pozY);
@@ -292,7 +295,7 @@ void Tema1::Update(float deltaTimeSeconds)
         if (pozY > resolution.y * 9.0f / 8.0f)
             reachedHeaven = 1;
     }
-    else if (timeSinceSpawn >= 7 && reachedHeaven == 1)
+    else if (timeSinceSpawn >= 0 && reachedHeaven == 1)
     {
         timeSinceSpawn = 0;
         flagInit = 0;
@@ -308,55 +311,66 @@ void Tema1::Update(float deltaTimeSeconds)
     }
     else if (flagInit == 0)
     {
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
+        if (firstBird)
+        {
+            if (timeSinceSpawn >= 3) {
+                timeSinceSpawn = 0;
+                firstBird = 0;
+            }
+        }
+        else {
+            random = 30.0f; // sterge
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
 
-        modelMatrix *= transf2D::Translate(cx, cy);
-        modelMatrix *= transf2D::Rotate((float)random * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(-cx, -cy);
+            modelMatrix *= transf2D::Translate(cx, cy);
+            modelMatrix *= transf2D::Rotate((float)random * (float)M_PI / 180.0f);
+            modelMatrix *= transf2D::Translate(-cx, -cy);
 
-        translateX += deltaTimeSeconds * speed * 1;
-        centerX += deltaTimeSeconds * speed * cosf((float)random * (float)M_PI / 180.0f);
-        centerY += deltaTimeSeconds * speed * sinf((float)random * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(translateX, translateY);
+            translateX += deltaTimeSeconds * speed * 1;
+            centerX += deltaTimeSeconds * speed * cosf((float)random * (float)M_PI / 180.0f);
+            centerY += deltaTimeSeconds * speed * sinf((float)random * (float)M_PI / 180.0f);
+            modelMatrix *= transf2D::Translate(translateX, translateY);
 
-        pozX = centerX - rectangleWidth / 2.0f;
-        pozY = centerY - rectangleHeight / 2.0f;
+            pozX = centerX - rectangleWidth / 2.0f;
+            pozY = centerY - rectangleHeight / 2.0f;
 
-        if (centerX > resolution.x || centerY > resolution.y || centerX < 0)
-            flagInit = 1;
+            if (centerX > resolution.x || centerY > resolution.y || centerX < 0)
+                flagInit = 1;
+        }
+
     }
     else if (flagInit == 1) {
         if (centerX > resolution.x) {
-            if (random > 0 && random < 90.0f)
+            if (random >= 0 && random <= 90.0f)
                 random = 90.0f + (90.0f - random);
             else
                 random = 180.0f + (360.0f - random);
-            centerX -= 1;
+            centerX = resolution.x;
             pozX = centerX - rectangleWidth / 2.0f;
         }
         else if (centerY > resolution.y) {
-            if (random > 90.0f && random < 180.0f)
+            if (random >= 90.0f && random <= 180.0f)
                 random = 180.0f + (180.0f - random);
             else
                 random = 270.0f + (90.0f - random);
-            centerY -= 1;
+            centerY = resolution.y;
             pozY = centerY - rectangleHeight / 2.0f;
         }
         else if (centerX < 0) {
-            if (random > 180.0f && random < 270.0f)
+            if (random >= 180.0f && random <= 270.0f)
                 random = 270.0f + (270.0f - random);
             else
                 random = 180.f - random;
-            centerX += 1;
+            centerX = 0;
             pozX = centerX - rectangleWidth / 2.0f;
         }
         else if (centerY < 0) {
-            if (random > 270.0f && random < 360.0f)
+            if (random >= 270.0f && random <= 360.0f)
                 random = 360.0f - random;
             else
                 random = 90.0f + (270.0f - random);
-            centerY += 1;
+            centerY = 0;
             pozY = centerY - rectangleHeight / 2.0f;
         }
         else
@@ -381,8 +395,6 @@ void Tema1::Update(float deltaTimeSeconds)
     RenderMesh2D(meshes["body"], shaders["VertexColor"], modelMatrix);
 
     RenderMesh2D(meshes["beak"], shaders["VertexColor"], modelMatrix);
-
-    //RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 
     tmpModelMatrix = modelMatrix;
 
@@ -410,6 +422,10 @@ void Tema1::Update(float deltaTimeSeconds)
     modelMatrix *= transf2D::Translate(-cx, -cy);
 
     RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
+
+    modelMatrix = tmpModelMatrix;
+
+    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 }
 
 
@@ -450,6 +466,66 @@ void Tema1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
+    glm::ivec2 resolution = window->GetResolution();
+
+    trueMouseX = mouseX;
+    trueMouseY = resolution.y - mouseY;
+
+    trueMouseX -= centerX;
+    trueMouseY -= centerY;
+
+    auxMouseX = trueMouseX;
+    auxMouseY = trueMouseY;
+
+    trueMouseX = cosf((float)random * (float)M_PI / 180.0f) * auxMouseX + sinf((float)random * (float)M_PI / 180.0f) * auxMouseY;
+    trueMouseY = -sinf((float)random * (float)M_PI / 180.0f) * auxMouseX + cosf((float)random * (float)M_PI / 180.0f) * auxMouseY;
+
+    //trueMouseX = trueMouseX * cosf((float)random * (float)M_PI / 180.0f);
+    //trueMouseY = trueMouseY * sinf((float)random * (float)M_PI / 180.0f);
+
+    //trueMouseX -= pozX * cosf((float)(random) * (float)M_PI / 180.0f);
+    //trueMouseY -= pozY * sinf((float)(random) * (float)M_PI / 180.0f);
+
+    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f)
+        cout << "Poc\n";
+    else
+        cout << "Ai ratat fraiere\n";
+
+    //cout << "Mouse: " << mouseX << " " << resolution.y - mouseY << "\n";
+    //cout << "Poz: " << centerX << " " << centerY << "\n";
+    //cout << "TrueMouse: " << trueMouseX << " " << trueMouseY << "\n";
+    //cout << pozX << " " << pozY << "\n\n";
+
+    //glm::vec3 vectorSucire = { trueMouseX, trueMouseY, 1 };
+
+    //auxModelMatrix = glm::mat3(1);
+    //if (flagInit == 1)
+    //    auxModelMatrix *= transf2D::Translate(pozX, pozY);
+    //else
+    //    auxModelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
+
+    //auxModelMatrix *= transf2D::Translate(pozX, resolution.y - pozY - 230.0f);
+    //auxModelMatrix *= transf2D::Translate(cx, cy);
+    //auxModelMatrix *= transf2D::Rotate((float)(random) * (float)M_PI / 180.0f);
+    //auxModelMatrix *= transf2D::Translate(-cx, -cy);
+
+    //cout << "random = " << random << "\n";
+
+
+    //vectorSucire = auxModelMatrix * vectorSucire;
+    //vectorSucire.x -= 280.0f;
+    //vectorSucire.y -= 230.0f;
+    //vectorSucire = transf2D::Rotate((float)(random) * (float)M_PI / 180.0f) * vectorSucire;
+    //vectorSucire = transf2D::Translate(-cx, -cy) * vectorSucire;
+
+    //cout << "(" << vectorSucire.x << ", " << vectorSucire.y << ")\n";
+    //cout << "\n"
+    //cout << "(" << pozX << ", " << pozY << ")\n";
+    //cout << "\n";
+    //cout << "(" << pozX << ", " << pozY << ")\n";
+    //cout << "(" << pozX + 280.0f << ", " << pozY << ")\n";
+    //cout << "(" << pozX << ", " << pozY + 230.0f << ")\n";
+    //cout << "(" << pozX + 280.0f << ", " << pozY + 230.0f << ")\n";
 }
 
 
