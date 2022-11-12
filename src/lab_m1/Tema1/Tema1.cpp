@@ -56,7 +56,7 @@ void Tema1::Init()
 
     theBirdIsHit = 0;
 
-    speed = 25; // 175 // 250
+    speed = 175; // 175 // 250
 
     // Initialize tx and ty (the translation steps)
     translateX = 0;
@@ -120,10 +120,12 @@ void Tema1::Init()
     firstBird = 1;
 
     reachedHeaven = 0;
+    theBirdIsHit = 0;
+    reachedHell = 0;
 
     timeSinceSpawn = 0;
 
-    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(1.0f/* 0.0f */, 0.5f, 1.0f), false);
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(0.0f, 0.5f, 1.0f), false);
     AddMeshToList(hitbox);
 
     Mesh* grass = obj2D::CreateRectangle("grass", corner, resolution.x, 230.0f * 3.0f / 4.0f, glm::vec3(0, 0.6f, 0.09f), true);
@@ -227,7 +229,7 @@ void Tema1::Update(float deltaTimeSeconds)
 
     grassModelMatrix = glm::mat3(1);
 
-    //RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
+    RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
 
     //if (centerX > resolution.x || centerY > resolution.y || centerX < 0 || centerY < 0) {
     //    flag = 1;
@@ -278,7 +280,7 @@ void Tema1::Update(float deltaTimeSeconds)
     //    modelMatrix *= transf2D::Translate(translateX, translateY);
     //    cout << translateX << "\n";
     //}
-    if (timeSinceSpawn >= 100 && reachedHeaven == 0) // 5
+    if (timeSinceSpawn >= 5 && reachedHeaven == 0 && theBirdIsHit == 0)
     {
         modelMatrix = glm::mat3(1);
         modelMatrix *= transf2D::Translate(pozX, pozY);
@@ -295,7 +297,7 @@ void Tema1::Update(float deltaTimeSeconds)
         if (pozY > resolution.y * 9.0f / 8.0f)
             reachedHeaven = 1;
     }
-    else if (timeSinceSpawn >= 0 && reachedHeaven == 1)
+    else if (timeSinceSpawn >= 0 && reachedHeaven == 1 && theBirdIsHit == 0)
     {
         timeSinceSpawn = 0;
         flagInit = 0;
@@ -306,8 +308,38 @@ void Tema1::Update(float deltaTimeSeconds)
         translateX = 0;
         centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
         centerY = cy;
-        cout << "bon" << "\n";
         reachedHeaven = 0;
+    }
+    else if (theBirdIsHit && reachedHell == 0)
+    {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transf2D::Translate(pozX, pozY);
+
+        modelMatrix *= transf2D::Translate(cx, cy);
+        modelMatrix *= transf2D::Rotate((float)270.0f * (float)M_PI / 180.0f);
+        modelMatrix *= transf2D::Translate(-cx, -cy);
+
+        centerX += deltaTimeSeconds * speed * cosf((float)270.0f * (float)M_PI / 180.0f);
+        centerY += deltaTimeSeconds * speed * sinf((float)270.0f * (float)M_PI / 180.0f);
+
+        pozX = centerX - rectangleWidth / 2.0f;
+        pozY = centerY - rectangleHeight / 2.0f;
+        if (pozY < -280.0f)
+            reachedHell = 1;
+    }
+    else if (theBirdIsHit && reachedHell == 1)
+    {
+        timeSinceSpawn = 0;
+        flagInit = 0;
+        if ((rand() % 2) == 0)
+            random = rand() % 50 + 15;
+        else
+            random = rand() % 50 + 105;
+        translateX = 0;
+        centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
+        centerY = cy;
+        theBirdIsHit = 0;
+        reachedHell = 0;
     }
     else if (flagInit == 0)
     {
@@ -319,7 +351,6 @@ void Tema1::Update(float deltaTimeSeconds)
             }
         }
         else {
-            random = 30.0f; // sterge
             modelMatrix = glm::mat3(1);
             modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
 
@@ -486,8 +517,10 @@ void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
     //trueMouseX -= pozX * cosf((float)(random) * (float)M_PI / 180.0f);
     //trueMouseY -= pozY * sinf((float)(random) * (float)M_PI / 180.0f);
 
-    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f)
+    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f) {
         cout << "Poc\n";
+        theBirdIsHit = 1;
+    }
     else
         cout << "Ai ratat fraiere\n";
 

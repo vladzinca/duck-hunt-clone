@@ -54,6 +54,7 @@ namespace m1
         int speed;
         float timeSinceSpawn;
         int reachedHeaven;
+        int reachedHell;
 
         int trueMouseX, trueMouseY;
         int auxMouseX, auxMouseY;
