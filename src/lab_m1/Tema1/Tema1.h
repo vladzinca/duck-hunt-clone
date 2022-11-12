@@ -29,35 +29,25 @@ namespace m1
 
     protected:
         float cx, cy;
-        glm::mat3 modelMatrix;
+        glm::mat3 modelMatrix, tmpModelMatrix, grassModelMatrix;
         float translateX, translateY;
-        float scaleX, scaleY;
-        float angularStep;
+        /*float scaleX, scaleY;*/
+        float leftAngularStep, rightAngularStep;
 
-        // TODO(student): If you need any other class variables, define them here.
-        float dirX, dirY;
         float rectangleWidth, rectangleHeight;
-        int random;
+        
+        int randomAngle;
 
-        float centerX, centerY;
-        float radianRandom;
-        float initialRandom;
-        float angularStep2;
+        float timeElapsed;
 
-        int flag, flag2, flagInit, flagTime, firstBird, theBirdIsHit;
-        glm::mat3 tmpModelMatrix;
-        glm::mat3 grassModelMatrix;
-        glm::mat3 auxModelMatrix;
+        float speed;
 
-        float pozX, pozY;
+        float coordinatesX, coordinatesY;
 
-        int speed;
-        float timeSinceSpawn;
-        int reachedHeaven;
-        int reachedHell;
+        bool isFirstBird, birdEscaped, reachedHeaven, isHit, reachedFloor;
 
-        int trueMouseX, trueMouseY;
-        int auxMouseX, auxMouseY;
+        float trueMouseX, trueMouseY;
+        float auxMouseX, auxMouseY;
 
     };
 }   // namespace m1

@@ -40,60 +40,35 @@ void Tema1::Init()
     rectangleWidth = 280;
     rectangleHeight = 230;
 
-    // TODO(student): Compute coordinates of a square's center, and store
-    // then in the `cx` and `cy` class variables (see the header). Use
-    // `corner` and `squareSide`. These two class variables will be used
-    // in the `Update()` function. Think about it, why do you need them?
     cx = corner.x + rectangleWidth / 2.0f;
     cy = corner.y + rectangleHeight / 2.0f;
 
-    if ((rand() % 2) == 0)
-        random = rand() % 50 + 15;
-    else
-        random = rand() % 50 + 105;
+    randomAngle = transf2D::getRandomAngle();
 
-    //random = 0;
+    timeElapsed = 0;
 
-    theBirdIsHit = 0;
+    speed = 175;
 
-    speed = 175; // 175 // 250
+    coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
+    coordinatesY = cy;
 
-    // Initialize tx and ty (the translation steps)
     translateX = 0;
     translateY = 0;
 
-    // Initialize sx and sy (the scale factors)
-    scaleX = 1;
-    scaleY = 1;
+    /*scaleX = 1;
+    scaleY = 1;*/
 
-    // Initialize angularStep
-    angularStep = 0;
-    angularStep2 = 0;
-    //angularStep2 = ((float)(45.0f) * (float)M_PI / 180.0f);
+    leftAngularStep = 0;
+    rightAngularStep = 0;
 
-    /* Mesh* square1 = obj2D::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
-    AddMeshToList(square1);
+    isFirstBird = true;
+    birdEscaped = false;
+    reachedHeaven = false;
+    isHit = false;
+    reachedFloor = false;
 
-    Mesh* square2 = obj2D::CreateSquare("square2", corner, squareSide, glm::vec3(0, 1, 0));
-    AddMeshToList(square2);
-
-    Mesh* square3 = obj2D::CreateSquare("square3", corner, squareSide, glm::vec3(0, 0, 1));
-    AddMeshToList(square3); */
-
-    /* Mesh* circle1 = obj2D::CreateCircle("circle1", corner + glm::vec3(525, 300, 0), 100, 64, glm::vec3(0.19f, 0.34f, 0.22f), true);
-    AddMeshToList(circle1);
-
-    Mesh* triangle1 = obj2D::CreateTriangle("triangle1", corner + glm::vec3(0, 175, 0), corner + glm::vec3(0, 400, 0), corner + glm::vec3(525, 288, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
-    AddMeshToList(triangle1);
-
-    Mesh* triangle2 = obj2D::CreateTriangle("triangle2", corner + glm::vec3(175, 325, 0), corner + glm::vec3(325, 325, 0), corner + glm::vec3(250, 575, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
-    AddMeshToList(triangle2);
-
-    Mesh* triangle3 = obj2D::CreateTriangle("triangle3", corner + glm::vec3(175, 250, 0), corner + glm::vec3(325, 250, 0), corner + glm::vec3(250, 0, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
-    AddMeshToList(triangle3);
-
-    Mesh* triangle4 = obj2D::CreateTriangle("triangle4", corner + glm::vec3(590, 230, 0), corner + glm::vec3(590, 275, 0), corner + glm::vec3(700, 245, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
-    AddMeshToList(triangle4); */
+    Mesh* grass = obj2D::CreateRectangle("grass", corner, (float)resolution.x, 172.5f, glm::vec3(0, 0.6f, 0.09f), true);
+    AddMeshToList(grass);
 
     Mesh* head = obj2D::CreateCircle("head", corner + glm::vec3(210, 120, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
     AddMeshToList(head);
@@ -110,27 +85,8 @@ void Tema1::Init()
     Mesh* beak = obj2D::CreateTriangle("beak", corner + glm::vec3(236, 98, 0), corner + glm::vec3(236, 116, 0), corner + glm::vec3(280, 104, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
     AddMeshToList(beak);
 
-    centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
-    centerY = cy;
-    flag = 0;
-    flag2 = 0;
-    pozX = 0;
-    pozY = 0;
-    flagInit = 0;
-    firstBird = 1;
-
-    reachedHeaven = 0;
-    theBirdIsHit = 0;
-    reachedHell = 0;
-
-    timeSinceSpawn = 0;
-
-    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280.0f, 230.0f, glm::vec3(0.0f, 0.5f, 1.0f), false);
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280, 230, glm::vec3(0, 0.5f, 1.0f), false);
     AddMeshToList(hitbox);
-
-    Mesh* grass = obj2D::CreateRectangle("grass", corner, resolution.x, 230.0f * 3.0f / 4.0f, glm::vec3(0, 0.6f, 0.09f), true);
-    AddMeshToList(grass);
-
 }
 
 
@@ -148,276 +104,128 @@ void Tema1::FrameStart()
 
 void Tema1::Update(float deltaTimeSeconds)
 {
-    /* // TODO(student): Update steps for translation, rotation and scale,
-    // in order to create animations. Use the class variables in the
-    // class header, and if you need more of them to complete the task,
-    // add them over there!
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transf2D::Translate(150, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented.
-    // Remember, the last matrix in the chain will take effect first!
-    if (translateX > 200) {
-        dirX = -1;
-        dirY = -1;
-    }
-    if (translateX < 0) {
-        dirX = 1;
-        dirY = 1;
-    }
-    translateX += deltaTimeSeconds * 100 * dirX;
-    translateY += deltaTimeSeconds * 100 * dirY;
-    modelMatrix *= transf2D::Translate(translateX, translateY);
-
-
-    RenderMesh2D(meshes["square1"], shaders["VertexColor"], modelMatrix);
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transf2D::Translate(400, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented
-    // Remember, the last matrix in the chain will take effect first!
-    angularStep += deltaTimeSeconds * 2.5;
-
-    modelMatrix *= transf2D::Translate(cx, cy);
-    modelMatrix *= transf2D::Rotate(angularStep);
-    modelMatrix *= transf2D::Translate(-cx, -cy);
-
-    RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transf2D::Translate(650, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented
-    // Remember, the last matrix in the chain will take effect first!
-    scaleX += deltaTimeSeconds * 0.5;
-    scaleY += deltaTimeSeconds * 0.5;
-    modelMatrix *= transf2D::Scale(scaleX, scaleY);
-
-    RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix); */
-
-    //modelMatrix = glm::mat3(1);
-    //modelMatrix *= transf2D::Translate(150, 250);
-    //if (translateX > 200) {
-    //    dirX = -1;
-    //    dirY = -1;
-    //}
-    //if (translateX < 0) {
-    //    dirX = 1;
-    //    dirY = 1;
-    //}
-    //translateX += deltaTimeSeconds * 100 * dirX;
-    //translateY += deltaTimeSeconds * 100 * dirY;
-    //modelMatrix *= transf2D::Translate(translateX, translateY);
-    //if (dirX == 1)
-    //{
-    //    modelMatrix *= transf2D::Translate(cx, cy);
-    //    modelMatrix *= transf2D::Rotate(45.0f * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(-cx, -cy);
-    //}
-    //if (dirX == -1)
-    //{
-    //    modelMatrix *= transf2D::Translate(cx, cy);
-    //    modelMatrix *= transf2D::Rotate(225.0f * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(-cx, -cy);
-    //}
-
     glm::ivec2 resolution = window->GetResolution();
 
-    timeSinceSpawn += deltaTimeSeconds;
+    timeElapsed += deltaTimeSeconds;
 
     grassModelMatrix = glm::mat3(1);
 
     RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
 
-    //if (centerX > resolution.x || centerY > resolution.y || centerX < 0 || centerY < 0) {
-    //    flag = 1;
-    //    flagInit = 1;
-    //    centerX -= 1;
-    //    centerY -= 1;
-    //}
-    //else {
-    //    flag = 0;
-    //}
-
-    //if (flagInit == 0)
-    //{
-    //    modelMatrix = glm::mat3(1);
-    //    modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
-
-    //    modelMatrix *= transf2D::Translate(cx, cy);
-    //    modelMatrix *= transf2D::Rotate((float)30.0f * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(-cx, -cy);
-
-    //    translateX += deltaTimeSeconds * 100 * 1;
-    //    centerX += deltaTimeSeconds * 100 * cosf((float)30.0f * (float)M_PI / 180.0f);
-    //    centerY += deltaTimeSeconds * 100 * sinf((float)30.0f * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(translateX, translateY);
-
-    //    cout << translateX << "\n";
-
-    //    pozX = centerX - rectangleWidth / 2.0f;
-    //    pozY = centerY - rectangleHeight / 2.0f;
-    //}
-    //else if (flag == 1) {
-    //    modelMatrix = glm::mat3(1);
-    //    modelMatrix *= transf2D::Translate(pozX, pozY);
-    //    modelMatrix *= transf2D::Translate(cx, cy);
-    //    modelMatrix *= transf2D::Rotate((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(-cx, -cy);
-    //    flag2 = 0;
-    //}
-    //else if (flag == 0) {
-    //    if (flag2 == 0) {
-    //        translateX = 0;
-    //        translateY = 0;
-    //        flag2 = 1;
-    //    }
-    //    translateX += deltaTimeSeconds * 100;
-    //    centerX += deltaTimeSeconds * 100 * cosf((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
-    //    centerY += deltaTimeSeconds * 100 * sinf((float)(90.0f + 60.0f) * (float)M_PI / 180.0f);
-    //    modelMatrix *= transf2D::Translate(translateX, translateY);
-    //    cout << translateX << "\n";
-    //}
-    if (timeSinceSpawn >= 5 && reachedHeaven == 0 && theBirdIsHit == 0)
+    if (timeElapsed >= 5 && reachedHeaven == false && isHit == false)
     {
+        birdEscaped = true;
         modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate(pozX, pozY);
+        modelMatrix *= transf2D::Translate(translateX, translateY);
 
         modelMatrix *= transf2D::Translate(cx, cy);
         modelMatrix *= transf2D::Rotate((float)90.0f * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(-cx, -cy);
 
-        centerX += deltaTimeSeconds * speed * cosf((float)90.0f * (float)M_PI / 180.0f);
-        centerY += deltaTimeSeconds * speed * sinf((float)90.0f * (float)M_PI / 180.0f);
+        coordinatesX += deltaTimeSeconds * speed * cosf((float)90.0f * (float)M_PI / 180.0f);
+        coordinatesY += deltaTimeSeconds * speed * sinf((float)90.0f * (float)M_PI / 180.0f);
 
-        pozX = centerX - rectangleWidth / 2.0f;
-        pozY = centerY - rectangleHeight / 2.0f;
-        if (pozY > resolution.y * 9.0f / 8.0f)
-            reachedHeaven = 1;
+        translateX = coordinatesX - rectangleWidth / 2.0f;
+        translateY = coordinatesY - rectangleHeight / 2.0f;
+        if (translateY > resolution.y * 9.0f / 8.0f)
+            reachedHeaven = true;
     }
-    else if (timeSinceSpawn >= 0 && reachedHeaven == 1 && theBirdIsHit == 0)
+    else if (timeElapsed >= 0 && reachedHeaven == true && isHit == false)
     {
-        timeSinceSpawn = 0;
-        flagInit = 0;
+        timeElapsed = 0;
         if ((rand() % 2) == 0)
-            random = rand() % 50 + 15;
+            randomAngle = rand() % 50 + 15;
         else
-            random = rand() % 50 + 105;
-        translateX = 0;
-        centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
-        centerY = cy;
-        reachedHeaven = 0;
+            randomAngle = rand() % 50 + 105;
+        coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
+        coordinatesY = cy;
+        reachedHeaven = false;
+        birdEscaped = false;
     }
-    else if (theBirdIsHit && reachedHell == 0)
+    else if (isHit && reachedFloor == false)
     {
         modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate(pozX, pozY);
+        modelMatrix *= transf2D::Translate(translateX, translateY);
 
         modelMatrix *= transf2D::Translate(cx, cy);
         modelMatrix *= transf2D::Rotate((float)270.0f * (float)M_PI / 180.0f);
         modelMatrix *= transf2D::Translate(-cx, -cy);
 
-        centerX += deltaTimeSeconds * speed * cosf((float)270.0f * (float)M_PI / 180.0f);
-        centerY += deltaTimeSeconds * speed * sinf((float)270.0f * (float)M_PI / 180.0f);
+        coordinatesX += deltaTimeSeconds * speed * cosf((float)270.0f * (float)M_PI / 180.0f);
+        coordinatesY += deltaTimeSeconds * speed * sinf((float)270.0f * (float)M_PI / 180.0f);
 
-        pozX = centerX - rectangleWidth / 2.0f;
-        pozY = centerY - rectangleHeight / 2.0f;
-        if (pozY < -280.0f)
-            reachedHell = 1;
+        translateX = coordinatesX - rectangleWidth / 2.0f;
+        translateY = coordinatesY - rectangleHeight / 2.0f;
+        if (translateY < -280.0f)
+            reachedFloor = true;
     }
-    else if (theBirdIsHit && reachedHell == 1)
+    else if (isHit && reachedFloor == true)
     {
-        timeSinceSpawn = 0;
-        flagInit = 0;
+        timeElapsed = 0;
         if ((rand() % 2) == 0)
-            random = rand() % 50 + 15;
+            randomAngle = rand() % 50 + 15;
         else
-            random = rand() % 50 + 105;
-        translateX = 0;
-        centerX = cx + (resolution.x - rectangleWidth) / 2.0f;
-        centerY = cy;
-        theBirdIsHit = 0;
-        reachedHell = 0;
+            randomAngle = rand() % 50 + 105;
+        coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
+        coordinatesY = cy;
+        isHit = 0;
+        reachedFloor = false;
     }
-    else if (flagInit == 0)
-    {
-        if (firstBird)
+    else {
+        if (isFirstBird)
         {
-            if (timeSinceSpawn >= 3) {
-                timeSinceSpawn = 0;
-                firstBird = 0;
+            if (timeElapsed >= 3) {
+                timeElapsed = 0;
+                isFirstBird = false;
             }
         }
-        else {
-            modelMatrix = glm::mat3(1);
-            modelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
-
-            modelMatrix *= transf2D::Translate(cx, cy);
-            modelMatrix *= transf2D::Rotate((float)random * (float)M_PI / 180.0f);
-            modelMatrix *= transf2D::Translate(-cx, -cy);
-
-            translateX += deltaTimeSeconds * speed * 1;
-            centerX += deltaTimeSeconds * speed * cosf((float)random * (float)M_PI / 180.0f);
-            centerY += deltaTimeSeconds * speed * sinf((float)random * (float)M_PI / 180.0f);
-            modelMatrix *= transf2D::Translate(translateX, translateY);
-
-            pozX = centerX - rectangleWidth / 2.0f;
-            pozY = centerY - rectangleHeight / 2.0f;
-
-            if (centerX > resolution.x || centerY > resolution.y || centerX < 0)
-                flagInit = 1;
-        }
-
-    }
-    else if (flagInit == 1) {
-        if (centerX > resolution.x) {
-            if (random >= 0 && random <= 90.0f)
-                random = 90.0f + (90.0f - random);
+        else if (coordinatesX > resolution.x) {
+            if (randomAngle > 0 && randomAngle < 90)
+                randomAngle = 90 + (90 - randomAngle);
             else
-                random = 180.0f + (360.0f - random);
-            centerX = resolution.x;
-            pozX = centerX - rectangleWidth / 2.0f;
+                randomAngle = 180 + (360 - randomAngle);
+            coordinatesX = (float)resolution.x;
+            translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (centerY > resolution.y) {
-            if (random >= 90.0f && random <= 180.0f)
-                random = 180.0f + (180.0f - random);
+        else if (coordinatesY > resolution.y) {
+            if (randomAngle >= 90 && randomAngle <= 180)
+                randomAngle = 180 + (180 - randomAngle);
             else
-                random = 270.0f + (90.0f - random);
-            centerY = resolution.y;
-            pozY = centerY - rectangleHeight / 2.0f;
+                randomAngle = 270 + (90 - randomAngle);
+            coordinatesY = (float)resolution.y;
+            translateY = coordinatesY - rectangleHeight / 2.0f;
         }
-        else if (centerX < 0) {
-            if (random >= 180.0f && random <= 270.0f)
-                random = 270.0f + (270.0f - random);
+        else if (coordinatesX < 0) {
+            if (randomAngle >= 180 && randomAngle <= 270)
+                randomAngle = 270 + (270 - randomAngle);
             else
-                random = 180.f - random;
-            centerX = 0;
-            pozX = centerX - rectangleWidth / 2.0f;
+                randomAngle = 180 - randomAngle;
+            coordinatesX = 0;
+            translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (centerY < 0) {
-            if (random >= 270.0f && random <= 360.0f)
-                random = 360.0f - random;
+        else if (coordinatesY < 0) {
+            if (randomAngle >= 270 && randomAngle <= 360)
+                randomAngle = 360 - randomAngle;
             else
-                random = 90.0f + (270.0f - random);
-            centerY = 0;
-            pozY = centerY - rectangleHeight / 2.0f;
+                randomAngle = 90 + (270 - randomAngle);
+            coordinatesY = 0;
+            translateX = coordinatesY - rectangleHeight / 2.0f;
         }
         else
         {
+            cout << "aici\n";
+            coordinatesX += deltaTimeSeconds * speed * cosf((float)(randomAngle) * (float)M_PI / 180.0f);
+            coordinatesY += deltaTimeSeconds * speed * sinf((float)(randomAngle) * (float)M_PI / 180.0f);
+
+            translateX = coordinatesX - rectangleWidth / 2.0f;
+            translateY = coordinatesY - rectangleHeight / 2.0f;
+
             modelMatrix = glm::mat3(1);
-            modelMatrix *= transf2D::Translate(pozX, pozY);
+            modelMatrix *= transf2D::Translate(translateX, translateY);
 
             modelMatrix *= transf2D::Translate(cx, cy);
-            modelMatrix *= transf2D::Rotate((float)(random) * (float)M_PI / 180.0f);
+            modelMatrix *= transf2D::Rotate((float)(randomAngle) * (float)M_PI / 180.0f);
             modelMatrix *= transf2D::Translate(-cx, -cy);
-
-            centerX += deltaTimeSeconds * speed * cosf((float)(random) * (float)M_PI / 180.0f);
-            centerY += deltaTimeSeconds * speed * sinf((float)(random) * (float)M_PI / 180.0f);
-
-            pozX = centerX - rectangleWidth / 2.0f;
-            pozY = centerY - rectangleHeight / 2.0f;
         }
     }
 
@@ -429,27 +237,26 @@ void Tema1::Update(float deltaTimeSeconds)
 
     tmpModelMatrix = modelMatrix;
 
-    if (angularStep < ((float)(30.0f) * (float)M_PI / 180.0f))
-        angularStep += deltaTimeSeconds;
+    if (leftAngularStep < ((float)(30.0f) * (float)M_PI / 180.0f))
+        leftAngularStep += deltaTimeSeconds;
     else
-        angularStep = (float)(- 10.0f) * (float)M_PI / 180.0f;
-    //cout << angularStep << "\n";
+        leftAngularStep = (float)(- 10.0f) * (float)M_PI / 180.0f;
 
     modelMatrix *= transf2D::Translate(cx, cy);
-    modelMatrix *= transf2D::Rotate(angularStep);
+    modelMatrix *= transf2D::Rotate(leftAngularStep);
     modelMatrix *= transf2D::Translate(-cx, -cy);
 
     RenderMesh2D(meshes["leftArm"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = tmpModelMatrix;
 
-    if (angularStep2 > ((float)(- 30.0f) * (float)M_PI / 180.0f))
-        angularStep2 -= deltaTimeSeconds;
+    if (rightAngularStep > ((float)(- 30.0f) * (float)M_PI / 180.0f))
+        rightAngularStep -= deltaTimeSeconds;
     else
-        angularStep2 = ((float)(10.0f) * (float)M_PI / 180.0f);
+        rightAngularStep = ((float)(10.0f) * (float)M_PI / 180.0f);
 
     modelMatrix *= transf2D::Translate(cx, cy);
-    modelMatrix *= transf2D::Rotate(angularStep2);
+    modelMatrix *= transf2D::Rotate(rightAngularStep);
     modelMatrix *= transf2D::Translate(-cx, -cy);
 
     RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
@@ -499,66 +306,24 @@ void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
     // Add mouse button press event
     glm::ivec2 resolution = window->GetResolution();
 
-    trueMouseX = mouseX;
-    trueMouseY = resolution.y - mouseY;
+    trueMouseX = (float)mouseX;
+    trueMouseY = resolution.y - (float)mouseY;
 
-    trueMouseX -= centerX;
-    trueMouseY -= centerY;
+    trueMouseX -= coordinatesX;
+    trueMouseY -= coordinatesY;
 
     auxMouseX = trueMouseX;
     auxMouseY = trueMouseY;
 
-    trueMouseX = cosf((float)random * (float)M_PI / 180.0f) * auxMouseX + sinf((float)random * (float)M_PI / 180.0f) * auxMouseY;
-    trueMouseY = -sinf((float)random * (float)M_PI / 180.0f) * auxMouseX + cosf((float)random * (float)M_PI / 180.0f) * auxMouseY;
+    trueMouseX = cosf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseX + sinf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseY;
+    trueMouseY = -sinf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseX + cosf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseY;
 
-    //trueMouseX = trueMouseX * cosf((float)random * (float)M_PI / 180.0f);
-    //trueMouseY = trueMouseY * sinf((float)random * (float)M_PI / 180.0f);
-
-    //trueMouseX -= pozX * cosf((float)(random) * (float)M_PI / 180.0f);
-    //trueMouseY -= pozY * sinf((float)(random) * (float)M_PI / 180.0f);
-
-    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f) {
+    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f && birdEscaped == false) {
         cout << "Poc\n";
-        theBirdIsHit = 1;
+        isHit = true;
     }
     else
         cout << "Ai ratat fraiere\n";
-
-    //cout << "Mouse: " << mouseX << " " << resolution.y - mouseY << "\n";
-    //cout << "Poz: " << centerX << " " << centerY << "\n";
-    //cout << "TrueMouse: " << trueMouseX << " " << trueMouseY << "\n";
-    //cout << pozX << " " << pozY << "\n\n";
-
-    //glm::vec3 vectorSucire = { trueMouseX, trueMouseY, 1 };
-
-    //auxModelMatrix = glm::mat3(1);
-    //if (flagInit == 1)
-    //    auxModelMatrix *= transf2D::Translate(pozX, pozY);
-    //else
-    //    auxModelMatrix *= transf2D::Translate((resolution.x - rectangleWidth) / 2.0f, 0);
-
-    //auxModelMatrix *= transf2D::Translate(pozX, resolution.y - pozY - 230.0f);
-    //auxModelMatrix *= transf2D::Translate(cx, cy);
-    //auxModelMatrix *= transf2D::Rotate((float)(random) * (float)M_PI / 180.0f);
-    //auxModelMatrix *= transf2D::Translate(-cx, -cy);
-
-    //cout << "random = " << random << "\n";
-
-
-    //vectorSucire = auxModelMatrix * vectorSucire;
-    //vectorSucire.x -= 280.0f;
-    //vectorSucire.y -= 230.0f;
-    //vectorSucire = transf2D::Rotate((float)(random) * (float)M_PI / 180.0f) * vectorSucire;
-    //vectorSucire = transf2D::Translate(-cx, -cy) * vectorSucire;
-
-    //cout << "(" << vectorSucire.x << ", " << vectorSucire.y << ")\n";
-    //cout << "\n"
-    //cout << "(" << pozX << ", " << pozY << ")\n";
-    //cout << "\n";
-    //cout << "(" << pozX << ", " << pozY << ")\n";
-    //cout << "(" << pozX + 280.0f << ", " << pozY << ")\n";
-    //cout << "(" << pozX << ", " << pozY + 230.0f << ")\n";
-    //cout << "(" << pozX + 280.0f << ", " << pozY + 230.0f << ")\n";
 }
 
 
