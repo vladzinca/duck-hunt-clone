@@ -44,6 +44,7 @@ void Tema1::Init()
     cy = corner.y + rectangleHeight / 2.0f;
 
     randomAngle = transf2D::getRandomAngle();
+    randomRadianAngle = transf2D::getRadiansFromAngle(randomAngle);
 
     timeElapsed = 0;
 
@@ -67,7 +68,7 @@ void Tema1::Init()
     isHit = false;
     reachedFloor = false;
 
-    Mesh* grass = obj2D::CreateRectangle("grass", corner, (float)resolution.x, 172.5f, glm::vec3(0, 0.6f, 0.09f), true);
+    Mesh* grass = obj2D::CreateRectangle("grass", corner, (float)resolution.x, 230, glm::vec3(0, 0.6f, 0.09f), true);
     AddMeshToList(grass);
 
     Mesh* head = obj2D::CreateCircle("head", corner + glm::vec3(210, 120, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
@@ -85,7 +86,7 @@ void Tema1::Init()
     Mesh* beak = obj2D::CreateTriangle("beak", corner + glm::vec3(236, 98, 0), corner + glm::vec3(236, 116, 0), corner + glm::vec3(280, 104, 0), glm::vec3(0.91f, 0.8f, 0.23f), true);
     AddMeshToList(beak);
 
-    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280, 230, glm::vec3(0, 0.5f, 1.0f), false);
+    Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280, 230, glm::vec3(1, 0.5f, 1), false);
     AddMeshToList(hitbox);
 }
 
@@ -106,127 +107,126 @@ void Tema1::Update(float deltaTimeSeconds)
 {
     glm::ivec2 resolution = window->GetResolution();
 
-    timeElapsed += deltaTimeSeconds;
-
     grassModelMatrix = glm::mat3(1);
-
     RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
 
-    if (timeElapsed >= 5 && reachedHeaven == false && isHit == false)
-    {
+    timeElapsed += deltaTimeSeconds;
+
+    if (timeElapsed >= 5 && !isHit)
         birdEscaped = true;
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate(translateX, translateY);
 
-        modelMatrix *= transf2D::Translate(cx, cy);
-        modelMatrix *= transf2D::Rotate((float)90.0f * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(-cx, -cy);
-
-        coordinatesX += deltaTimeSeconds * speed * cosf((float)90.0f * (float)M_PI / 180.0f);
-        coordinatesY += deltaTimeSeconds * speed * sinf((float)90.0f * (float)M_PI / 180.0f);
-
-        translateX = coordinatesX - rectangleWidth / 2.0f;
-        translateY = coordinatesY - rectangleHeight / 2.0f;
-        if (translateY > resolution.y * 9.0f / 8.0f)
-            reachedHeaven = true;
-    }
-    else if (timeElapsed >= 0 && reachedHeaven == true && isHit == false)
+    if (isFirstBird)
     {
-        timeElapsed = 0;
-        if ((rand() % 2) == 0)
-            randomAngle = rand() % 50 + 15;
-        else
-            randomAngle = rand() % 50 + 105;
-        coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
-        coordinatesY = cy;
-        reachedHeaven = false;
-        birdEscaped = false;
+        if (timeElapsed >= 3) {
+            timeElapsed = 0;
+            isFirstBird = false;
+        }
     }
-    else if (isHit && reachedFloor == false)
+    else
     {
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transf2D::Translate(translateX, translateY);
-
-        modelMatrix *= transf2D::Translate(cx, cy);
-        modelMatrix *= transf2D::Rotate((float)270.0f * (float)M_PI / 180.0f);
-        modelMatrix *= transf2D::Translate(-cx, -cy);
-
-        coordinatesX += deltaTimeSeconds * speed * cosf((float)270.0f * (float)M_PI / 180.0f);
-        coordinatesY += deltaTimeSeconds * speed * sinf((float)270.0f * (float)M_PI / 180.0f);
-
-        translateX = coordinatesX - rectangleWidth / 2.0f;
-        translateY = coordinatesY - rectangleHeight / 2.0f;
-        if (translateY < -280.0f)
-            reachedFloor = true;
-    }
-    else if (isHit && reachedFloor == true)
-    {
-        timeElapsed = 0;
-        if ((rand() % 2) == 0)
-            randomAngle = rand() % 50 + 15;
-        else
-            randomAngle = rand() % 50 + 105;
-        coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
-        coordinatesY = cy;
-        isHit = 0;
-        reachedFloor = false;
-    }
-    else {
-        if (isFirstBird)
+        if (birdEscaped)
         {
-            if (timeElapsed >= 3) {
+            if (reachedHeaven)
+            {
+                randomAngle = transf2D::getRandomAngle();
+
                 timeElapsed = 0;
-                isFirstBird = false;
+
+                coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
+                coordinatesY = cy;
+
+                birdEscaped = false;
+                reachedHeaven = false;
+            }
+            else
+            {
+                randomAngle = 90;
+
+                if (translateY > resolution.y * 9.0f / 8.0f)
+                    reachedHeaven = true;
             }
         }
-        else if (coordinatesX > resolution.x) {
-            if (randomAngle > 0 && randomAngle < 90)
+        else if (isHit)
+        {
+            if (reachedFloor)
+            {
+                randomAngle = transf2D::getRandomAngle();
+
+                timeElapsed = 0;
+                
+                coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
+                coordinatesY = cy;
+
+                isHit = false;
+                reachedFloor = false;
+            }
+            else
+            {
+                randomAngle = 270;
+
+                if (translateY < -rectangleHeight)
+                    reachedFloor = true;
+            }
+        }
+        else if (coordinatesX >= resolution.x)
+        {
+            if (randomAngle >= 0 && randomAngle <= 90)
                 randomAngle = 90 + (90 - randomAngle);
             else
                 randomAngle = 180 + (360 - randomAngle);
+
             coordinatesX = (float)resolution.x;
+
             translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (coordinatesY > resolution.y) {
+        else if (coordinatesY >= resolution.y)
+        {
             if (randomAngle >= 90 && randomAngle <= 180)
                 randomAngle = 180 + (180 - randomAngle);
             else
                 randomAngle = 270 + (90 - randomAngle);
+
             coordinatesY = (float)resolution.y;
+
             translateY = coordinatesY - rectangleHeight / 2.0f;
         }
-        else if (coordinatesX < 0) {
+        else if (coordinatesX <= 0)
+        {
             if (randomAngle >= 180 && randomAngle <= 270)
                 randomAngle = 270 + (270 - randomAngle);
             else
                 randomAngle = 180 - randomAngle;
+
             coordinatesX = 0;
+
             translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (coordinatesY < 0) {
+        else if (coordinatesY <= 0)
+        {
             if (randomAngle >= 270 && randomAngle <= 360)
                 randomAngle = 360 - randomAngle;
             else
                 randomAngle = 90 + (270 - randomAngle);
+
             coordinatesY = 0;
+
             translateX = coordinatesY - rectangleHeight / 2.0f;
         }
-        else
-        {
-            cout << "aici\n";
-            coordinatesX += deltaTimeSeconds * speed * cosf((float)(randomAngle) * (float)M_PI / 180.0f);
-            coordinatesY += deltaTimeSeconds * speed * sinf((float)(randomAngle) * (float)M_PI / 180.0f);
 
-            translateX = coordinatesX - rectangleWidth / 2.0f;
-            translateY = coordinatesY - rectangleHeight / 2.0f;
+        randomRadianAngle = transf2D::getRadiansFromAngle(randomAngle);
 
-            modelMatrix = glm::mat3(1);
-            modelMatrix *= transf2D::Translate(translateX, translateY);
+        coordinatesX += deltaTimeSeconds * speed * cosf(randomRadianAngle);
+        coordinatesY += deltaTimeSeconds * speed * sinf(randomRadianAngle);
 
-            modelMatrix *= transf2D::Translate(cx, cy);
-            modelMatrix *= transf2D::Rotate((float)(randomAngle) * (float)M_PI / 180.0f);
-            modelMatrix *= transf2D::Translate(-cx, -cy);
-        }
+        translateX = coordinatesX - rectangleWidth / 2.0f;
+        translateY = coordinatesY - rectangleHeight / 2.0f;
+
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transf2D::Translate(translateX, translateY);
+
+        modelMatrix *= transf2D::Translate(cx, cy);
+        modelMatrix *= transf2D::Rotate(randomRadianAngle);
+        modelMatrix *= transf2D::Translate(-cx, -cy);
     }
 
     RenderMesh2D(meshes["head"], shaders["VertexColor"], modelMatrix);
@@ -235,12 +235,14 @@ void Tema1::Update(float deltaTimeSeconds)
 
     RenderMesh2D(meshes["beak"], shaders["VertexColor"], modelMatrix);
 
+    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
+
     tmpModelMatrix = modelMatrix;
 
-    if (leftAngularStep < ((float)(30.0f) * (float)M_PI / 180.0f))
+    if (leftAngularStep < transf2D::getRadiansFromAngle(30))
         leftAngularStep += deltaTimeSeconds;
     else
-        leftAngularStep = (float)(- 10.0f) * (float)M_PI / 180.0f;
+        leftAngularStep = transf2D::getRadiansFromAngle(-10);
 
     modelMatrix *= transf2D::Translate(cx, cy);
     modelMatrix *= transf2D::Rotate(leftAngularStep);
@@ -250,10 +252,10 @@ void Tema1::Update(float deltaTimeSeconds)
 
     modelMatrix = tmpModelMatrix;
 
-    if (rightAngularStep > ((float)(- 30.0f) * (float)M_PI / 180.0f))
+    if (rightAngularStep > transf2D::getRadiansFromAngle(-30))
         rightAngularStep -= deltaTimeSeconds;
     else
-        rightAngularStep = ((float)(10.0f) * (float)M_PI / 180.0f);
+        rightAngularStep = transf2D::getRadiansFromAngle(10);
 
     modelMatrix *= transf2D::Translate(cx, cy);
     modelMatrix *= transf2D::Rotate(rightAngularStep);
@@ -262,8 +264,6 @@ void Tema1::Update(float deltaTimeSeconds)
     RenderMesh2D(meshes["rightArm"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = tmpModelMatrix;
-
-    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 }
 
 
@@ -306,24 +306,20 @@ void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
     // Add mouse button press event
     glm::ivec2 resolution = window->GetResolution();
 
-    trueMouseX = (float)mouseX;
-    trueMouseY = resolution.y - (float)mouseY;
+    glm::vec2 trueMouseCoordinates = { (float)mouseX, resolution.y - (float)mouseY };
+    trueMouseCoordinates -= glm::vec2(coordinatesX, coordinatesY);
 
-    trueMouseX -= coordinatesX;
-    trueMouseY -= coordinatesY;
+    glm::mat2 rotationMatrix = glm::transpose(
+        glm::mat2(
+            cosf(randomRadianAngle), sinf(randomRadianAngle),
+            -sinf(randomRadianAngle), cosf(randomRadianAngle)
+            )
+        );
 
-    auxMouseX = trueMouseX;
-    auxMouseY = trueMouseY;
+    trueMouseCoordinates = rotationMatrix * trueMouseCoordinates;
 
-    trueMouseX = cosf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseX + sinf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseY;
-    trueMouseY = -sinf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseX + cosf((float)randomAngle * (float)M_PI / 180.0f) * auxMouseY;
-
-    if (trueMouseX >= -140.0f && trueMouseX <= 140.0f && trueMouseY >= -115.0f && trueMouseY <= 115.0f && birdEscaped == false) {
-        cout << "Poc\n";
+    if (trueMouseCoordinates.x >= -140.0f && trueMouseCoordinates.x <= 140.0f && trueMouseCoordinates.y >= -115.0f && trueMouseCoordinates.y <= 115.0f && !birdEscaped)
         isHit = true;
-    }
-    else
-        cout << "Ai ratat fraiere\n";
 }
 
 

@@ -37,6 +37,7 @@ namespace m1
         float rectangleWidth, rectangleHeight;
         
         int randomAngle;
+        float randomRadianAngle;
 
         float timeElapsed;
 
@@ -47,7 +48,5 @@ namespace m1
         bool isFirstBird, birdEscaped, reachedHeaven, isHit, reachedFloor;
 
         float trueMouseX, trueMouseY;
-        float auxMouseX, auxMouseY;
-
     };
 }   // namespace m1
