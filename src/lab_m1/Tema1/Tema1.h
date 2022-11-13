@@ -35,6 +35,7 @@ namespace m1
         float leftAngularStep, rightAngularStep;
 
         float rectangleWidth, rectangleHeight;
+        float headPositionWidth, headPositionHeight;
         
         int randomAngle;
         float randomRadianAngle;
@@ -45,7 +46,9 @@ namespace m1
 
         float coordinatesX, coordinatesY;
 
-        bool isFirstBird, birdEscaped, reachedHeaven, isHit, reachedFloor;
+        float headX, headY;
+
+        bool isFirstBird, birdEscaped, reachedHeaven, isHit, reachedFloor, debugMode;
 
         float trueMouseX, trueMouseY;
     };

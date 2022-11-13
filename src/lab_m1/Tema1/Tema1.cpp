@@ -39,6 +39,8 @@ void Tema1::Init()
     glm::vec3 corner = glm::vec3(0, 0, 0);
     rectangleWidth = 280;
     rectangleHeight = 230;
+    headPositionWidth = 210;
+    headPositionHeight = 120;
 
     cx = corner.x + rectangleWidth / 2.0f;
     cy = corner.y + rectangleHeight / 2.0f;
@@ -52,6 +54,9 @@ void Tema1::Init()
 
     coordinatesX = cx + (resolution.x - rectangleWidth) / 2.0f;
     coordinatesY = cy;
+
+    headX = headPositionWidth;
+    headY = headPositionHeight;
 
     translateX = 0;
     translateY = 0;
@@ -67,11 +72,12 @@ void Tema1::Init()
     reachedHeaven = false;
     isHit = false;
     reachedFloor = false;
+    debugMode = false;
 
     Mesh* grass = obj2D::CreateRectangle("grass", corner, (float)resolution.x, 230, glm::vec3(0, 0.6f, 0.09f), true);
     AddMeshToList(grass);
 
-    Mesh* head = obj2D::CreateCircle("head", corner + glm::vec3(210, 120, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
+    Mesh* head = obj2D::CreateCircle("head", corner + glm::vec3(headPositionWidth, headPositionHeight, 0), 40, 32, glm::vec3(0.19f, 0.34f, 0.22f), true);
     AddMeshToList(head);
 
     Mesh* body = obj2D::CreateTriangle("body", corner + glm::vec3(0, 70, 0), corner + glm::vec3(0, 160, 0), corner + glm::vec3(210, 115.2f, 0), glm::vec3(0.35f, 0.23f, 0.15f), true);
@@ -88,6 +94,12 @@ void Tema1::Init()
 
     Mesh* hitbox = obj2D::CreateRectangle("hitbox", corner, 280, 230, glm::vec3(1, 0.5f, 1), false);
     AddMeshToList(hitbox);
+
+    Mesh* bodyCenter = obj2D::CreateSquare("bodyCenter", corner + glm::vec3(140, 115, 0), 2, glm::vec3(1, 0.5f, 1), true);
+    AddMeshToList(bodyCenter);
+
+    Mesh* headCenter = obj2D::CreateSquare("headCenter", corner + glm::vec3(210, 120, 0), 2, glm::vec3(1, 0.5f, 1), true);
+    AddMeshToList(headCenter);
 }
 
 
@@ -107,13 +119,21 @@ void Tema1::Update(float deltaTimeSeconds)
 {
     glm::ivec2 resolution = window->GetResolution();
 
-    grassModelMatrix = glm::mat3(1);
-    RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
+    if (!debugMode)
+    {
+        grassModelMatrix = glm::mat3(1);
+        RenderMesh2D(meshes["grass"], shaders["VertexColor"], grassModelMatrix);
+    }
 
     timeElapsed += deltaTimeSeconds;
 
-    if (timeElapsed >= 5 && !isHit)
-        birdEscaped = true;
+    if (!debugMode)
+    {
+        if (timeElapsed >= 5 && !isHit)
+            birdEscaped = true;
+    }
+    else
+        timeElapsed = 0;
 
     if (isFirstBird)
     {
@@ -168,55 +188,42 @@ void Tema1::Update(float deltaTimeSeconds)
                     reachedFloor = true;
             }
         }
-        else if (coordinatesX >= resolution.x)
+        else if (headX >= resolution.x)
         {
             if (randomAngle >= 0 && randomAngle <= 90)
                 randomAngle = 90 + (90 - randomAngle);
             else
                 randomAngle = 180 + (360 - randomAngle);
-
-            coordinatesX = (float)resolution.x;
-
-            translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (coordinatesY >= resolution.y)
+        else if (headY >= resolution.y)
         {
             if (randomAngle >= 90 && randomAngle <= 180)
                 randomAngle = 180 + (180 - randomAngle);
             else
                 randomAngle = 270 + (90 - randomAngle);
-
-            coordinatesY = (float)resolution.y;
-
-            translateY = coordinatesY - rectangleHeight / 2.0f;
         }
-        else if (coordinatesX <= 0)
+        else if (headX <= 0)
         {
             if (randomAngle >= 180 && randomAngle <= 270)
                 randomAngle = 270 + (270 - randomAngle);
             else
                 randomAngle = 180 - randomAngle;
-
-            coordinatesX = 0;
-
-            translateX = coordinatesX - rectangleWidth / 2.0f;
         }
-        else if (coordinatesY <= 0)
+        else if (headY <= 0)
         {
             if (randomAngle >= 270 && randomAngle <= 360)
                 randomAngle = 360 - randomAngle;
             else
                 randomAngle = 90 + (270 - randomAngle);
-
-            coordinatesY = 0;
-
-            translateX = coordinatesY - rectangleHeight / 2.0f;
         }
 
         randomRadianAngle = transf2D::getRadiansFromAngle(randomAngle);
 
         coordinatesX += deltaTimeSeconds * speed * cosf(randomRadianAngle);
         coordinatesY += deltaTimeSeconds * speed * sinf(randomRadianAngle);
+
+        headX = coordinatesX + (rectangleWidth - headPositionWidth) * cosf(randomRadianAngle) + (headPositionHeight - rectangleHeight / 2.0f) * sinf(randomRadianAngle);
+        headY = coordinatesY + (rectangleWidth - headPositionWidth) * sinf(randomRadianAngle) + (headPositionHeight - rectangleHeight / 2.0f) * cosf(randomRadianAngle);
 
         translateX = coordinatesX - rectangleWidth / 2.0f;
         translateY = coordinatesY - rectangleHeight / 2.0f;
@@ -229,13 +236,20 @@ void Tema1::Update(float deltaTimeSeconds)
         modelMatrix *= transf2D::Translate(-cx, -cy);
     }
 
+    if (debugMode)
+    {
+        RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
+
+        RenderMesh2D(meshes["bodyCenter"], shaders["VertexColor"], modelMatrix);
+
+        RenderMesh2D(meshes["headCenter"], shaders["VertexColor"], modelMatrix);
+    }
+
     RenderMesh2D(meshes["head"], shaders["VertexColor"], modelMatrix);
 
     RenderMesh2D(meshes["body"], shaders["VertexColor"], modelMatrix);
 
     RenderMesh2D(meshes["beak"], shaders["VertexColor"], modelMatrix);
-
-    RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 
     tmpModelMatrix = modelMatrix;
 
@@ -286,6 +300,18 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
 void Tema1::OnKeyPress(int key, int mods)
 {
     // Add key press event
+    if (key == GLFW_KEY_T)
+    {
+        switch (debugMode)
+        {
+        case true:
+            debugMode = false;
+            break;
+        default:
+            debugMode = true;
+            break;
+        }
+    }
 }
 
 
