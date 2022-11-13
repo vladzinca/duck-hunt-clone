@@ -29,26 +29,31 @@ namespace m1
 
     protected:
         float cx, cy;
-        glm::mat3 modelMatrix, tmpModelMatrix, grassModelMatrix;
+        glm::mat3 modelMatrix, tmpModelMatrix, staticModelMatrix;
         float translateX, translateY;
-        /*float scaleX, scaleY;*/
+        float scoreScaleX, scoreScaleY;
         float leftAngularStep, rightAngularStep;
 
         float rectangleWidth, rectangleHeight;
         float headPositionWidth, headPositionHeight;
-        
+
         int randomAngle;
         float randomRadianAngle;
 
         float timeElapsed;
 
-        float speed;
+        int duckCount, escapedDuckCount, killedDuckCount;
+        float speed, initialSpeed, speedCoefficient;
 
         float coordinatesX, coordinatesY;
 
         float headX, headY;
 
         bool isFirstBird, birdEscaped, reachedHeaven, isHit, reachedFloor, debugMode;
+
+        int lifeCount, bulletCount, score;
+
+        bool gameOver, displayOnlyOnce;
 
         float trueMouseX, trueMouseY;
     };

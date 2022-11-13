@@ -49,4 +49,10 @@ namespace transf2D
     {
         return (float)angle * (float)M_PI / 180.0f;
     }
+
+    // Get starting coordinate
+    inline float getStartingCoordinate()
+    {
+        return (float)(rand() % 50 + 25) / 100.0f;
+    }
 }   // namespace transf2D
