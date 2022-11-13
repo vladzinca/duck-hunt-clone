@@ -35,4 +35,6 @@ Secondly, checking that the mouse position is touching the duck meant I had to c
 
 ## Did you know?
 
-If you are more curious to observe the background computations of these processes, pressing T on the keyboard while the game is running reveals what I termed a Debug Mode, that freezes the game state and enables the hitbox, as well as several points of interest. In Debug Mode, the duck cannot escape anymore, and you can spend your time watching it bounce off the window's edges, as well as killing it when you get bored. How wonderful!
+If you are more curious to observe the background computations of these processes, pressing T on the keyboard while the game is running reveals what I termed a Debug Mode, that freezes the game state and enables the hitbox, as well as several points of interest.
+
+In Debug Mode, the duck cannot escape anymore, and you can spend your time watching it bounce off the window's edges, as well as killing it when you get bored. How wonderful!
